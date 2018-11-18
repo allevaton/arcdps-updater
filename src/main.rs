@@ -66,10 +66,10 @@ fn download_new() {
   println!("Done");
 }
 
-fn calculate_hash(file: &mut File) -> Digest {
+fn calculate_md5(file: &mut File) -> String {
   let mut buffer = Vec::new();
   file.read_to_end(&mut buffer).unwrap();
-  md5::compute(buffer)
+  format!("{:x}", md5::compute(buffer))
 }
 
 fn main() {
@@ -81,9 +81,9 @@ fn main() {
       download_new();
     }
     Ok(mut file) => {
-      let calc_hash = calculate_hash(&mut file);
+      let file_hash = calculate_md5(&mut file);
 
-      if format!("{:x}", calc_hash).eq(&hash) {
+      if file_hash.eq(&hash) {
         println!("ArcDPS is up to date");
         return;
       }
