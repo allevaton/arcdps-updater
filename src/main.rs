@@ -1,14 +1,20 @@
 extern crate curl;
 extern crate md5;
 
-#[allow(unused_imports)]
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::str;
 
 use curl::easy::Easy;
+#[allow(unused_imports)]
 use md5::{compute, Digest};
+
+macro_rules! flush {
+  () => {{
+    std::io::stdout().flush().unwrap();
+  }};
+}
 
 const HASH_URL: &str = "https://www.deltaconnected.com/arcdps/x64/d3d9.dll.md5sum";
 const DLL_URL: &str = "https://www.deltaconnected.com/arcdps/x64/d3d9.dll";
@@ -41,14 +47,17 @@ fn read_hash() -> String {
 fn backup_old() {
   // Copy to d3d9.dll.bak
   print!("Backing up... ");
+  flush!();
 
-  fs::copy("./d3d9.dll", "./d3d9.dll.bak");
+  fs::copy("./d3d9.dll", "./d3d9.dll.bak").unwrap();
 
   println!("Done");
+  flush!();
 }
 
 fn download_new() {
   print!("Downloading... ");
+  flush!();
 
   let mut handle = Easy::new();
   handle.url(DLL_URL).unwrap();
@@ -64,6 +73,7 @@ fn download_new() {
   }
 
   println!("Done");
+  flush!();
 }
 
 fn calculate_md5(file: &mut File) -> String {
@@ -89,6 +99,7 @@ fn main() {
       }
 
       println!("New version found");
+      flush!();
 
       backup_old();
       download_new();
